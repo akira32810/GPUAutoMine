@@ -24,13 +24,13 @@ namespace GPUUsageStartMine
                     var gpuUsage = GetGPUUsage(gpuCounters);
                     Console.WriteLine(gpuUsage);
 
-                    if (gpuUsage < 70 && pname.Length == 0)
+                    if (gpuUsage < 20 && pname.Length == 0)
                     {
                         countX_StartProcess++;
                         countY_StopProcess = 0;
                     }
 
-                    if (countX_StartProcess >= 3)
+                    if (countX_StartProcess >=6)
                     {
 
 
@@ -40,14 +40,14 @@ namespace GPUUsageStartMine
 
                     }
 
-                    if (gpuUsage > 70 && pname.Length > 0)
+                    if (gpuUsage > 20 && pname.Length > 0)
                     {
                         countY_StopProcess++;
                         countX_StartProcess = 0;
 
                     }
 
-                    if (countY_StopProcess >= 3)
+                    if (countY_StopProcess >= 6)
                     {
                         foreach (var process in pname)
                         {
@@ -62,9 +62,10 @@ namespace GPUUsageStartMine
                 catch (Exception ex)
                 {
                     Console.WriteLine(ex.StackTrace.ToString());
+                    continue;
                 }
 
-                Thread.Sleep(4000);
+            
             }
         }
 
