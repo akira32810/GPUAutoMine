@@ -13,49 +13,52 @@ namespace GPUUsageStartMine
         {
 
             int countX_StartProcess = 0;
-            int countY_StopProcess = 0;
-
+   
+          
+           
             while (true)
             {
                 try
                 {
-                    Process[] pname = Process.GetProcessesByName("miner");
-                    var gpuCounters = GetGPUCounters();
-                    var gpuUsage = GetGPUUsage(gpuCounters);
-                    Console.WriteLine(gpuUsage);
+                    Process[] myMiner = Process.GetProcessesByName("miner");
+                    Process[] myP = Process.GetProcesses();
+              
+                    var myPList = myP.ToList().Where(x => x.PrivateMemorySize64 / 1024 / 1024 > 2000);
+                    var PListExeceptMiner = myPList.Where(x => !x.ProcessName.Contains("miner")).Count();
+                   // var PListExeceptMiner = myPList.Except(PListMiner).First().ProcessName;
+                    //var gpuCounters = GetGPUCounters();
+                    //var gpuUsage = GetGPUUsage(gpuCounters);
+                  
+                    Console.WriteLine(PListExeceptMiner);
 
-                    if (gpuUsage < 20 && pname.Length == 0)
+                    if (PListExeceptMiner==0)
                     {
                         countX_StartProcess++;
-                        countY_StopProcess = 0;
                     }
 
-                    if (countX_StartProcess >=6)
+                    if (PListExeceptMiner>0)
+                    {
+                        countX_StartProcess = 0;
+                        foreach (var process in  myMiner)
+                        {
+                           
+                            process.Kill();
+                        }
+
+                    }
+                              
+
+                    if (countX_StartProcess >= 3 && myMiner.Length==0)
                     {
 
 
                         string strCmdText = Properties.Resources.minerStr;
                         System.Diagnostics.Process.Start("CMD.exe", strCmdText);
-                        countX_StartProcess = 0;
+                       
 
                     }
 
-                    if (gpuUsage > 20 && pname.Length > 0)
-                    {
-                        countY_StopProcess++;
-                        countX_StartProcess = 0;
-
-                    }
-
-                    if (countY_StopProcess >= 6)
-                    {
-                        foreach (var process in pname)
-                        {
-                            process.Kill();
-                        }
-                        countY_StopProcess = 0;
-                    }
-
+                   
                     Thread.Sleep(4000);
                     continue;
                 }
@@ -65,7 +68,7 @@ namespace GPUUsageStartMine
                     continue;
                 }
 
-            
+
             }
         }
 
